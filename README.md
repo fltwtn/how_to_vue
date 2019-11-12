@@ -68,12 +68,117 @@ $ npm install
 $ npm run serve    # start vue devserver
 ```
 
-## deploy
+## 一から Vue プロジェクトを作る場合
+
+クライアントサイドで起動するアプリは Vue.js で書かれている。ここでは Vue プロジェクトを作成し、アプリを開発できる環境を整える。
+
+## 大まかな流れ
+
+- `ndenv` をインストールする。（node.js における pyenv のようなもの）
+
+```
+$ brew install ndenv
+$ echo 'export PATH="$HOME/.ndenv/bin:$PATH"' >> ~/.bash_profile
+$ echo 'eval "$(ndenv init -)"' >> ~/.bash_profile
+$ source ~/.bash_profile
+$ git clone https://github.com/riywo/node-build.git $(ndenv root)/plugins/node-build
+
+$ ndenv --version # versionが表示されればOK
+```
+
+- `ndenv`で `v10.15.3`をインストールし、グローバル環境で`npm`コマンドが使えるようにする。
+
+```
+$ ndenv install v10.15.3
+$ ndenv global v10.15.3
+$ npm --version #バージョンが表示されればOK
+```
+
+- `vue-cli` が使えるようにする。
+
+```
+$ npm install -g @vue/cli
+$ vue --version #バージョンが表示されればOK
+```
+
+- プロジェクトルートにて、vue-cli でプロジェクトを作成する。
+
+```
+$ vue create front-web
+
+# インタラクティブ画面に遷移するので、以下のように答えていく
+
+? Please pick a preset: (Use arrow keys)
+  default (babel, eslint)
+❯ Manually select features　＃こちらを選択
+
+? Check the features needed for your project: (Press <space> to select, <a> to toggle all, <i> to invert selection)
+❯◉ Babel
+ ◯ TypeScript
+ ◯ Progressive Web App (PWA) Support
+ ◉ Router    #選択
+ ◉ Vuex    #選択
+ ◯ CSS Pre-processors
+ ◉ Linter / Formatter    #選択
+ ◉ Unit Testing    #選択
+ ◉ E2E Testing    #選択
+
+? Use history mode for router? (Requires proper server setup for index fallback in production) (Y/n)    # Yを入力
+
+? Pick a linter / formatter config: (Use arrow keys)
+  ESLint with error prevention only
+  ESLint + Airbnb config
+  ESLint + Standard config
+❯ ESLint + Prettier    #選択
+
+? Pick additional lint features: (Press <space> to select, <a> to toggle all, <i> to invert selection)
+❯◉ Lint on save    #選択
+ ◯ Lint and fix on commit
+
+? Pick a unit testing solution: (Use arrow keys)
+❯ Mocha + Chai     #選択
+  Jest
+
+? Pick a E2E testing solution: (Use arrow keys)
+  Cypress (Chrome only)
+❯  Nightwatch (Selenium-based)     #選択
+
+? Where do you prefer placing config for Babel, PostCSS, ESLint, etc.? (Use arrow keys)
+❯ In dedicated config files    #選択
+  In package.json
+
+? Save this as a preset for future projects? (y/N)    #Nを入力
+```
+
+- `/front-web`ディレクトリに移動し、以下のファイルを作成する。
 
 ```
 $ cd front-web
-$ npm run build
-$ cd ..
-$ docker-compose build
-$ docker-compose up -d
+$ mkdir .vscode
+$ touch ./.vscode/settings.json
+# ファイルに以下を記載
+{
+    "editor.formatOnSave": true,
+    "eslint.validate": ["javascript", { "autoFix": true, "language": "vue" }],
+    "prettier.eslintIntegration": true,
+    "eslint.autoFixOnSave": true
+  }
+$ touch vue.config.js
+# ファイルに以下を記載
+const path = require("path");
+
+module.exports = {
+  devServer: {
+    host: "localhost",
+    port: 8081,
+    disableHostCheck: true
+  }
+};
+
+```
+
+- 開発サーバを起動し、`localhost:8081`にブラウザでアクセス。アイコンが表示されることを確認する。
+
+```
+$ npm run serve
 ```
